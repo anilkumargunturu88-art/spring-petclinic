@@ -55,35 +55,32 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                sshagent(['ec2-ssh']) {
+    steps {
+        sshagent(['ec2-ssh']) {
 
-                    sh '''
-                    ssh -o StrictHostKeyChecking=no ec2-user@47.129.246.137 << EOF
+            sh '''
+            ssh -o StrictHostKeyChecking=no ec2-user@47.129.246.137 << EOF
 
-                    export AWS_PAGER=""
+            export AWS_PAGER=""
 
-                    aws ecr get-login-password --region ap-southeast-1 | docker login \
-                    --username AWS \
-                    --password-stdin \
-                    575005867523.dkr.ecr.ap-southeast-1.amazonaws.com
+            aws ecr get-login-password --region ap-southeast-1 | docker login \
+            --username AWS \
+            --password-stdin \
+            575005867523.dkr.ecr.ap-southeast-1.amazonaws.com
 
-                    docker pull \
-                    575005867523.dkr.ecr.ap-southeast-1.amazonaws.com/appecr:latest
+            docker pull \
+            575005867523.dkr.ecr.ap-southeast-1.amazonaws.com/appecr:latest
 
-                    docker stop spring-petclinic || true
-                    docker rm spring-petclinic || true
+            docker stop spring-petclinic || true
+            docker rm spring-petclinic || true
 
-                    docker run -d \
-                    --name spring-petclinic \
-                    -p 8081:8080 \
-                    575005867523.dkr.ecr.ap-southeast-1.amazonaws.com/appecr:latest
+            docker run -d \
+            --name spring-petclinic \
+            -p 8081:8080 \
+            575005867523.dkr.ecr.ap-southeast-1.amazonaws.com/appecr:latest
 
-                    EOF
-                    '''
-                }
-            }
+            EOF
+            '''
         }
-
     }
 }
